@@ -1,4 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { easeOut } from "framer-motion";
+
 export default function FeaturedWork() {
   const projects = [
     {
@@ -27,32 +32,60 @@ export default function FeaturedWork() {
     },
   ];
 
-  return (
-    <section className="py-8 sm:py-10">
-      <div className="mx-auto max-w-4xl px-6">
-        <h2 className="text-3xl font-semibold tracking-tight text-gray-900">
-          Selected Work
-        </h2>
+  // Animation variants for staggered card fade/slide
+  const container = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.15,
+      },
+    },
+  };
 
-        <div className="mt-12 grid gap-8">
+  const card = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
+  };
+
+  return (
+    <section className="py-24 sm:py-32 bg-gray-900">
+      <div className="mx-auto max-w-4xl px-6">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: easeOut }}
+          className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900"
+        >
+          Selected Work
+        </motion.h2>
+
+        <motion.div
+          className="mt-12 grid gap-8"
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+        >
           {projects.map((project) => (
-            <div
+            <motion.div
               key={project.title}
-              className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition"
+              variants={card}
+              className="p-8 border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-transform duration-300"
             >
-              <h3 className="text-xl font-semibold text-gray-900">{project.title}</h3>
+              <h3 className="text-xl sm:text-2xl font-semibold text-gray-900">
+                {project.title}
+              </h3>
               <p className="mt-2 text-gray-600">{project.description}</p>
               <Link
                 href={project.href}
-                className="mt-4 inline-block text-blue-600 hover:underline"
+                className="mt-4 inline-block text-blue-600 hover:underline font-medium"
               >
                 View case study
               </Link>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 }
-
