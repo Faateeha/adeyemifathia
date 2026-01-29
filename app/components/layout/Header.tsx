@@ -1,95 +1,87 @@
-import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
-import { useState } from "react";
+"use client";
+
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 
-function Navbar() {
-  const [nav, setNav] = useState(false);
+const navLinks = [
+  { label: "Home", href: "#home" },
+  { label: "About", href: "#about" },
+  { label: "Skills", href: "#skills" },
+  { label: "Projects", href: "#projects" },
+  { label: "Contact", href: "#contact" },
+];
 
-  const handleNav = () => {
-    setNav(!nav);
-    // Toggle body scroll lock
-    if (!nav) {
-      document.body.style.overflow = "hidden"; // Disable scrolling
-    } else {
-      document.body.style.overflow = "auto"; // Enable scrolling
-    }
-  };
+export default function Navbar() {
+  const [navOpen, setNavOpen] = useState(false);
 
-  const handleLinkClick = () => {
-    setNav(false); // Close the navigation menu when a link is clicked
-    document.body.style.overflow = "auto"; // Enable scrolling
-  };
+  // Lock body scroll when mobile nav is open
+  useEffect(() => {
+    document.body.style.overflow = navOpen ? "hidden" : "auto";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [navOpen]);
+
+  const closeNav = () => setNavOpen(false);
 
   return (
-    <div className="flex justify-between items-center h-24 max-w-[1240px] mx-auto px-4 text-white relative">
-      <Link smooth to={"#home"}>
-        <h1 className="w-full text-3xl font-bold hover:text-[#819096]">Portfolio.</h1>
-      </Link>
-      {/* Desktop view */}
-      <ul className="hidden md:flex">
-        <li className="p-4 hover:text-[#819096]">
-          <Link smooth to={"#home"}>
-            Home
-          </Link>
-        </li>
-        <li className="p-4 hover:text-[#819096]">
-          <Link smooth to={"#about"}>
-            About
-          </Link>
-        </li>
-        <li className="p-4 hover:text-[#819096]">
-          <Link smooth to={"#skills"}>
-            Skills
-          </Link>
-        </li>
-        <li className="p-4 hover:text-[#819096]">
-          <Link smooth to={"#projects"}>
-            Projects
-          </Link>
-        </li>
-        <li className="p-4 hover:text-[#819096]">
-          <Link smooth to={"#contact"}>
-            Contact
-          </Link>
-        </li>
-      </ul>
+    <header className="fixed top-0 left-0 w-full z-50 bg-black text-white">
+      <nav className="flex justify-between items-center h-20 max-w-[1240px] mx-auto px-4">
+        {/* Logo */}
+        <Link href="#home" className="text-xl font-bold hover:text-[#819096] transition">
+          Portfolio.
+        </Link>
 
-      {/* Mobile view */}
-      <div onClick={handleNav} className="block md:hidden">
-        {nav ? <AiOutlineClose size={20} /> : <AiOutlineMenu size={20} />}
-      </div>
-      {/* Overlay to prevent content interaction */}
-      {nav && (
-        <div className="fixed inset-0 bg-black opacity-50 z-50" onClick={handleNav}></div>
-      )}
-      <div
-        className={
-          nav
-            ? "fixed left-0 top-0 w-[60%] h-full border-r border-r-gray-900 bg-[#000300] ease-in-out duration-500 z-50"
-            : "fixed left-[-100%] z-50"
-        }
-      >
-        <h1 className="w-full text-3xl font-bold m-4 hover:text-[#819096]">Portfolio.</h1>
-        <ul className="uppercase p-4">
-          <li className="p-4 border-b border-gray-600 hover:text-[#819096]">
-            <Link smooth to={"#home"} onClick={handleLinkClick}>Home</Link>
-          </li>
-          <li className="p-4 border-b border-gray-600 hover:text-[#819096]">
-            <Link smooth to={"#about"} onClick={handleLinkClick}>About</Link>
-          </li>
-          <li className="p-4 border-b border-gray-600 hover:text-[#819096]">
-            <Link smooth to={"#skills"} onClick={handleLinkClick}>Skills</Link>
-          </li>
-          <li className="p-4 border-b border-gray-600 hover:text-[#819096]">
-            <Link smooth to={"#projects"} onClick={handleLinkClick}>Projects</Link>
-          </li>
-          <li className="p-4 hover:text-[#819096]">
-            <Link smooth to={"#contact"} onClick={handleLinkClick}>Contact</Link>
-          </li>
+        {/* Desktop Nav */}
+        <ul className="hidden md:flex">
+          {navLinks.map((link) => (
+            <li key={link.href} className="p-4 hover:text-[#819096] transition">
+              <Link href={link.href}>{link.label}</Link>
+            </li>
+          ))}
         </ul>
-      </div>
-    </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setNavOpen((prev) => !prev)}
+          className="block md:hidden"
+          aria-label="Toggle navigation"
+        >
+          {navOpen ? <AiOutlineClose size={22} /> : <AiOutlineMenu size={22} />}
+        </button>
+      </nav>
+
+      {/* Overlay */}
+      {navOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 md:hidden"
+          onClick={closeNav}
+        />
+      )}
+
+      {/* Mobile Drawer */}
+      <aside
+        className={`fixed top-0 left-0 h-full w-[65%] bg-[#000300] border-r border-gray-800 transform transition-transform duration-300 ease-in-out md:hidden
+        ${navOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <div className="p-6">
+          <h2 className="text-3xl font-bold mb-8">Portfolio.</h2>
+
+          <ul className="uppercase space-y-6">
+            {navLinks.map((link) => (
+              <li
+                key={link.href}
+                className="border-b border-gray-700 pb-2 hover:text-[#819096] transition"
+              >
+                <Link href={link.href} onClick={closeNav}>
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+    </header>
   );
 }
-
-export default Navbar;
